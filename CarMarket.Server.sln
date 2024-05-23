@@ -5,6 +5,10 @@ VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarMarket.Server", "CarMarket.Server\CarMarket.Server.csproj", "{170997DB-5D3B-48A8-88E6-E26B05B00784}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerService", "LoggerService\LoggerService.csproj", "{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{170997DB-5D3B-48A8-88E6-E26B05B00784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{170997DB-5D3B-48A8-88E6-E26B05B00784}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{170997DB-5D3B-48A8-88E6-E26B05B00784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

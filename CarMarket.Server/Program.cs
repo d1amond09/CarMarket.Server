@@ -1,5 +1,7 @@
+using NLog;
 using CarMarket.Server.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 
 namespace CarMarket.Server;
 
@@ -8,6 +10,7 @@ public class Program
 	public static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
+		LogManager.Setup().LoadConfigurationFromFile("nlog.config", true);
 
 		ConfigureServices(builder.Services);
 
@@ -22,6 +25,8 @@ public class Program
 	{
 		services.ConfigureCors();
 		services.ConfigureIISIntegration();
+		services.ConfigureLoggerService();
+
 		services.AddControllers();
 	}
 
@@ -45,7 +50,6 @@ public class Program
 		app.UseRouting();
 		app.UseAuthorization();
 
-		app.MapRazorPages();
 		app.MapControllerRoute(
 			name: "default",
 			pattern: "{controller=Home}/{action=Index}/{id?}");
