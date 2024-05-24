@@ -1,4 +1,6 @@
 using CarMarket.Server.Extensions;
+using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 
@@ -27,6 +29,9 @@ public class Program
 		services.ConfigureLoggerService();
 		services.ConfigureSqlContext(configuration);
 		services.ConfigureRepositoryManager();
+		services.AddAutoMapper(x => x.CreateMap<CarShop, CarShopDto>()
+				.ForMember(c => c.Name, 
+				opt => opt.MapFrom(x => string.Join(' ', "Name:", x.Name))));
 
 		services.AddControllers();
 	}
