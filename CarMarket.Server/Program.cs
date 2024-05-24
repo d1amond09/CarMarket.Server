@@ -1,7 +1,6 @@
-using NLog;
 using CarMarket.Server.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
+using NLog;
 
 namespace CarMarket.Server;
 
@@ -12,7 +11,7 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 		LogManager.Setup().LoadConfigurationFromFile("nlog.config", true);
 
-		ConfigureServices(builder.Services);
+		ConfigureServices(builder.Services, builder.Configuration);
 
 		var app = builder.Build();
 
@@ -21,11 +20,13 @@ public class Program
 		app.Run();
 	}
 
-	public static void ConfigureServices(IServiceCollection services)
+	public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{
 		services.ConfigureCors();
 		services.ConfigureIISIntegration();
 		services.ConfigureLoggerService();
+		services.ConfigureSqlContext(configuration);
+		services.ConfigureRepositoryManager();
 
 		services.AddControllers();
 	}

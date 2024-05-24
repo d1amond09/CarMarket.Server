@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarMarket.Server", "CarMarket.Server\CarMarket.Server.csproj", "{170997DB-5D3B-48A8-88E6-E26B05B00784}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarMarket.Server", "CarMarket.Server\CarMarket.Server.csproj", "{170997DB-5D3B-48A8-88E6-E26B05B00784}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{83B3B871-BBB6-4D96-8C72-6396E7D8E7F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerService", "LoggerService\LoggerService.csproj", "{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerService\LoggerService.csproj", "{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{DE1D1969-CF64-45B4-975F-6D65B55D362E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{87564870-CAC9-4EEB-8E95-BDFDDF40E058}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4AAED52-A9F6-48C4-9B0E-AEF5642D57D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE1D1969-CF64-45B4-975F-6D65B55D362E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE1D1969-CF64-45B4-975F-6D65B55D362E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE1D1969-CF64-45B4-975F-6D65B55D362E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE1D1969-CF64-45B4-975F-6D65B55D362E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87564870-CAC9-4EEB-8E95-BDFDDF40E058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87564870-CAC9-4EEB-8E95-BDFDDF40E058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87564870-CAC9-4EEB-8E95-BDFDDF40E058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87564870-CAC9-4EEB-8E95-BDFDDF40E058}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
