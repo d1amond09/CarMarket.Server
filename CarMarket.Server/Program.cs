@@ -1,7 +1,13 @@
 using CarMarket.Server.Extensions;
+using CarMarket.Server.Helpers;
+using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using LoggerService;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Logging;
 using NLog;
 
 namespace CarMarket.Server;
@@ -12,52 +18,54 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 		LogManager.Setup().LoadConfigurationFromFile("nlog.config", true);
-
 		ConfigureServices(builder.Services, builder.Configuration);
 
 		var app = builder.Build();
 
-		ConfigureApp(app);
+		ConfigureApp(app, app.Services, app.Environment);
+
+		app.MapControllers();
 
 		app.Run();
 	}
 
 	public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{
+		services.ConfigureLoggerService();
 		services.ConfigureCors();
 		services.ConfigureIISIntegration();
-		services.ConfigureLoggerService();
 		services.ConfigureSqlContext(configuration);
 		services.ConfigureRepositoryManager();
 		services.AddAutoMapper(x => x.CreateMap<CarShop, CarShopDto>()
-				.ForMember(c => c.Name, 
-				opt => opt.MapFrom(x => string.Join(' ', "Name:", x.Name))));
+				.ForMember(c => c.Name, opt => 
+					opt.MapFrom(x => string.Join(' ', "Name:", x.Name))));
+		
 
 		services.AddControllers();
 	}
 
-	public static void ConfigureApp(WebApplication app)
+	public static void ConfigureApp(IApplicationBuilder app, IServiceProvider servicesProvider, IWebHostEnvironment environment)
 	{
-		if (app.Environment.IsDevelopment())
-		{
-			app.UseDeveloperExceptionPage();
-		}
-		else
-		{
-			app.UseHsts();
-		}
+		/*if (environment.IsDevelopment()) app.UseDeveloperExceptionPage();
+		else app.UseHsts();*/
+
+		app.ConfigureExceptionMiddleware();
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
+
 		app.UseCors("CorsPolicy");
+
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
 		{
 			ForwardedHeaders = ForwardedHeaders.All
 		});
+
 		app.UseRouting();
 		app.UseAuthorization();
 
-		app.MapControllerRoute(
-			name: "default",
-			pattern: "{controller=Home}/{action=Index}/{id?}");
+		app.UseEndpoints(endpoints =>
+		{
+			endpoints.MapControllers();
+		});
 	}
 }

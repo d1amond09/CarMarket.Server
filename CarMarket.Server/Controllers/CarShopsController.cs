@@ -3,6 +3,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Entities.DataTransferObjects;
 using AutoMapper;
+using CarMarket.Server.Exceptions;
 
 namespace CarMarket.Server.Controllers
 {
@@ -20,22 +21,15 @@ namespace CarMarket.Server.Controllers
 			_logger = logger;
 			_mapper = mapper;
 		}
+
 		[HttpGet]
 		public IActionResult GetCarShops()
 		{
-			try
-			{
-				var carShops = _repository.CarShop.GetAllCarShops(trackChanges: false);
+			var carShops = _repository.CarShop.GetAllCarShops(trackChanges: false);
 
-				var carShopsDto = _mapper.Map<IEnumerable<CarShopDto>>(carShops);
-
-				return Ok(carShopsDto);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Something went wrong in the {nameof(GetCarShops)} action {ex}");
-				return StatusCode(500, "Internal server error");
-			}
+			var carShopsDto = _mapper.Map<IEnumerable<CarShopDto>>(carShops);
+			
+			return Ok(carShopsDto);
 		}
 
 	}

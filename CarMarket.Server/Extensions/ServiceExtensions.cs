@@ -3,13 +3,14 @@ using Entities;
 using LoggerService;
 using Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CarMarket.Server.Extensions;
 
 public static class ServiceExtensions
 {
 	public static void ConfigureCors(this IServiceCollection services) =>
-		services.AddCors(options =>
+		services.AddCors(options => 
 		{
 			options.AddPolicy("CorsPolicy", builder =>
 			builder.AllowAnyOrigin()
@@ -24,7 +25,7 @@ public static class ServiceExtensions
 		});
 
 	public static void ConfigureLoggerService(this IServiceCollection services) =>
-		services.AddScoped<ILoggerManager, LoggerManager>();
+		services.AddSingleton<ILoggerManager, LoggerManager>();
 
 	public static void ConfigureSqlContext(this IServiceCollection services,
 		IConfiguration configuration) =>
@@ -33,6 +34,6 @@ public static class ServiceExtensions
 		b.MigrationsAssembly("CarMarket.Server")));
 
 	public static void ConfigureRepositoryManager(this IServiceCollection services) =>
-		services.AddScoped<IRepositoryManager, RepositoryManager>();
+		services.TryAddScoped<IRepositoryManager, RepositoryManager>();
 
 }
