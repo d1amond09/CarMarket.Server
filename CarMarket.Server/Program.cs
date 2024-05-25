@@ -37,9 +37,14 @@ public class Program
 		services.ConfigureSqlContext(configuration);
 		services.ConfigureRepositoryManager();
 		services.ConfigureAutoMapping();
-		
 
-		services.AddControllers();
+		services.AddControllers(config =>
+		{
+			config.RespectBrowserAcceptHeader = true;
+			config.ReturnHttpNotAcceptable = true;
+		}).AddXmlDataContractSerializerFormatters()
+		.AddCustomCSVFormatter();
+
 	}
 
 	public static void ConfigureApp(IApplicationBuilder app, IServiceProvider servicesProvider, IWebHostEnvironment environment)

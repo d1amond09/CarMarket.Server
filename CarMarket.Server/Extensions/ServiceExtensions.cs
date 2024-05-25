@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using CarMarket.Server.Formatters.Output;
 
 namespace CarMarket.Server.Extensions;
 
@@ -46,5 +47,9 @@ public static class ServiceExtensions
 
 		services.AddAutoMapper(x => x.CreateMap<Car, CarDto>());
 	}
+
+	public static IMvcBuilder AddCustomCSVFormatter(this IMvcBuilder builder) =>
+		builder.AddMvcOptions(config => 
+			config.OutputFormatters.Add(new CsvOutputFormatter()));
 
 }
