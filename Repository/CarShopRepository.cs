@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using System.ComponentModel.Design;
+using Contracts;
 using Entities;
 using Entities.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -15,4 +16,9 @@ public class CarShopRepository : RepositoryBase<CarShop>, ICarShopRepository
 
 	public IEnumerable<CarShop> GetAllCarShops(bool trackChanges) =>
 		[.. FindAll(trackChanges).OrderBy(c => c.Name)];
+
+	public CarShop? GetCarShop(Guid carShopId, bool trackChanges) =>
+		FindByCondition(c => c.Id.Equals(carShopId), trackChanges)
+		.SingleOrDefault();
+
 }

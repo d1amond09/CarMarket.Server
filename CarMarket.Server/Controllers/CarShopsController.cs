@@ -28,9 +28,24 @@ namespace CarMarket.Server.Controllers
 			var carShops = _repository.CarShop.GetAllCarShops(trackChanges: false);
 
 			var carShopsDto = _mapper.Map<IEnumerable<CarShopDto>>(carShops);
-			
+
 			return Ok(carShopsDto);
 		}
 
+		[HttpGet("{id}")]
+		public IActionResult GetCarShop(Guid id)
+		{
+			var carShop = _repository.CarShop.GetCarShop(id, trackChanges: false);
+			if (carShop == null)
+			{
+				_logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
+				return NotFound();
+			}
+			else
+			{
+				var carShopDto = _mapper.Map<CarShopDto>(carShop);
+				return Ok(carShopDto);
+			}
+		}
 	}
 }

@@ -36,9 +36,7 @@ public class Program
 		services.ConfigureIISIntegration();
 		services.ConfigureSqlContext(configuration);
 		services.ConfigureRepositoryManager();
-		services.AddAutoMapper(x => x.CreateMap<CarShop, CarShopDto>()
-				.ForMember(c => c.Name, opt => 
-					opt.MapFrom(x => string.Join(' ', "Name:", x.Name))));
+		services.ConfigureAutoMapping();
 		
 
 		services.AddControllers();
