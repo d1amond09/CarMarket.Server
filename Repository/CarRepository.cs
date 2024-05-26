@@ -16,6 +16,8 @@ public class CarRepository(RepositoryContext repositoryContext)
 		Create(car);
 	}
 
+	public void DeleteCar(Car car) => Delete(car);
+
 	public Car? GetCar(Guid carShopId, Guid id, bool trackChanges) =>
 		FindByCondition(e => 
 		e.CarShopId.Equals(carShopId) && e.Id.Equals(id), trackChanges)

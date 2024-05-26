@@ -8,5 +8,6 @@ public interface ICarShopRepository
 	IEnumerable<CarShop> GetAllCarShops(bool trackChanges);
 	CarShop? GetCarShop(Guid carShopId, bool trackChanges);
 	public void CreateCarShop(Guid addressId, CarShop carShop);
+	public void DeleteCarShop(CarShop carShop);
 
 }

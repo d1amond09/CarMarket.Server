@@ -14,6 +14,7 @@ public class BrandRepository(RepositoryContext repositoryContext)
 	public IEnumerable<Brand> GetAllBrands(bool trackChanges) =>
 		[.. FindAll(trackChanges).OrderBy(c => c.Name)];
 
-	public void CreateBrand(Brand brand) =>
-		Create(brand);
+	public void CreateBrand(Brand brand) => Create(brand);
+
+	public void DeleteBrand(Brand brand) => Delete(brand);
 }

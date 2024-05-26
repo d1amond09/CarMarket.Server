@@ -15,6 +15,8 @@ public class CarShopRepository(RepositoryContext repositoryContext)
 		Create(carShop);
 	}
 
+	public void DeleteCarShop(CarShop carShop) => Delete(carShop);
+
 	public IEnumerable<CarShop> GetAllCarShops(bool trackChanges) =>
 		[.. FindAll(trackChanges).OrderBy(c => c.Name)];
 

@@ -8,4 +8,6 @@ public interface IAddressRepository
 	Address? GetAddress(Guid countryId, Guid id, bool trackChanges);
 	Address? GetAddress(Guid id, bool trackChanges);
 	public void CreateAddress(Guid countryId, Address address);
+	public void DeleteAddress(Address address);
+
 }

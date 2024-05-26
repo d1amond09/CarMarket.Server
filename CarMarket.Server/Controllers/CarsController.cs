@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
+using Entities;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +52,7 @@ public class CarsController(IRepositoryManager repository,
 		return Ok(car);
 	}
 
-	[HttpPost]
+	[HttpPost("({brandId},{carcaseId})")]
 	public IActionResult CreateCarShop(Guid carShopId, Guid brandId, Guid carcaseId, [FromBody] CarForCreationDto car)
 	{
 		if (car == null)
@@ -87,5 +88,26 @@ public class CarsController(IRepositoryManager repository,
 		_repository.Save();
 		var carToReturn = _mapper.Map<CarDto>(carEntity);
 		return CreatedAtRoute("GetCarById", new { carShopId, id = carToReturn.Id }, carToReturn);
+	}
+
+	[HttpDelete("{id}")]
+	public IActionResult DeleteCarcase(Guid carShopId, Guid id)
+	{
+		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
+		if (carShop == null)
+		{
+			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
+			return NotFound();
+		}
+
+		var car = _repository.Car.GetCar(carShopId, id, trackChanges: false);
+		if (car == null)
+		{
+			_logger.LogInfo($"Car with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_repository.Car.DeleteCar(car);
+		_repository.Save();
+		return NoContent();
 	}
 }

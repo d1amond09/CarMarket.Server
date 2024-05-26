@@ -46,7 +46,7 @@ public class CarShopsController(IRepositoryManager repository,
 		}
 	}
 
-	[HttpPost]
+	[HttpPost("{addressId}")]
 	public IActionResult CreateCarShop(Guid addressId, [FromBody] CarShopForCreationDto carShop)
 	{
 		if (carShop == null)
@@ -69,4 +69,17 @@ public class CarShopsController(IRepositoryManager repository,
 		return CreatedAtRoute("GetCarShopById", new { id = carShopToReturn.Id }, carShopToReturn);
 	}
 
+	[HttpDelete("{id}")]
+	public IActionResult DeleteCarShop(Guid id)
+	{
+		var carShop = _repository.CarShop.GetCarShop(id, trackChanges: false);
+		if (carShop == null)
+		{
+			_logger.LogInfo($"CarShop with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_repository.CarShop.DeleteCarShop(carShop);
+		_repository.Save();
+		return NoContent();
+	}
 }

@@ -10,4 +10,5 @@ public interface ICountryRepository
 	IEnumerable<Country> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
 	Country? GetCountry(Guid countryId, bool trackChanges);
 	public void CreateCountry(Country country);
+	public void DeleteCountry(Country country);
 }

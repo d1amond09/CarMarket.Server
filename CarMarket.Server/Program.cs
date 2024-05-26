@@ -54,7 +54,6 @@ public class Program
 
 		app.ConfigureExceptionMiddleware();
 		app.UseHttpsRedirection();
-		app.UseStaticFiles();
 
 		app.UseCors("CorsPolicy");
 

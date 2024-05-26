@@ -8,4 +8,5 @@ public interface IBrandRepository
 	IEnumerable<Brand> GetAllBrands(bool trackChanges);
 	Brand? GetBrand(Guid id, bool trackChanges);
 	public void CreateBrand(Brand brand);
+	public void DeleteBrand(Brand brand);
 }

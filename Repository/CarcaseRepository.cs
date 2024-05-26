@@ -16,4 +16,6 @@ public class CarcaseRepository(RepositoryContext repositoryContext)
 
 	public void CreateCarcase(Carcase carcase) =>
 		Create(carcase);
+
+	public void DeleteCarcase(Carcase carcase) => Delete(carcase);
 }

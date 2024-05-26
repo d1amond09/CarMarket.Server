@@ -53,4 +53,18 @@ public class BrandsController(IRepositoryManager repository,
 		var brandToReturn = _mapper.Map<BrandDto>(brandEntity);
 		return CreatedAtRoute("GetBrandById", new { id = brandToReturn.Id }, brandToReturn);
 	}
+
+	[HttpDelete("{id}")]
+	public IActionResult DeleteBrand(Guid id)
+	{
+		var brand = _repository.Brand.GetBrand(id, trackChanges: false);
+		if (brand == null)
+		{
+			_logger.LogInfo($"Brand with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_repository.Brand.DeleteBrand(brand);
+		_repository.Save();
+		return NoContent();
+	}
 }

@@ -53,4 +53,18 @@ public class CarcasesController(IRepositoryManager repository,
 		var carcaseToReturn = _mapper.Map<CarcaseDto>(carcaseEntity);
 		return CreatedAtRoute("GetCarcaseById", new { id = carcaseToReturn.Id }, carcaseToReturn);
 	}
+
+	[HttpDelete("{id}")]
+	public IActionResult DeleteCarcase(Guid id)
+	{
+		var carcase = _repository.Carcase.GetCarcase(id, trackChanges: false);
+		if (carcase == null)
+		{
+			_logger.LogInfo($"Carcase with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_repository.Carcase.DeleteCarcase(carcase);
+		_repository.Save();
+		return NoContent();
+	}
 }

@@ -72,4 +72,26 @@ public class AddressesController(IRepositoryManager repository,
 		var addressToReturn = _mapper.Map<AddressDto>(addressEntity);
 		return CreatedAtRoute("GetAddressById", new { countryId, id = addressToReturn.Id }, addressToReturn);
 	}
+
+	[HttpDelete("{id}")]
+	public IActionResult DeleteAddressForCountry(Guid countryId, Guid id)
+	{
+		var country = _repository.Country.GetCountry(countryId, trackChanges: false);
+		if (country == null)
+		{
+			_logger.LogInfo($"Country with id: {countryId} doesn't exist in the database.");
+			return NotFound();
+		}
+
+		var addressForCountry = _repository.Address.GetAddress(countryId, id, trackChanges: false);
+		if (addressForCountry == null)
+		{
+			_logger.LogInfo($"Address with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_repository.Address.DeleteAddress(addressForCountry);
+		_repository.Save();
+		return NoContent();
+	}
+
 }

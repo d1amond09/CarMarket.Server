@@ -95,4 +95,18 @@ public class CountriesController(IRepositoryManager repository,
 		return CreatedAtRoute("CountryCollection", new { ids }, countryCollectionToReturn);
 	}
 
+	[HttpDelete("{id}")]
+	public IActionResult DeleteCountry(Guid id)
+	{
+		var country = _repository.Country.GetCountry(id, trackChanges: false);
+		if (country == null)
+		{
+			_logger.LogInfo($"Country with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_repository.Country.DeleteCountry(country);
+		_repository.Save();
+		return NoContent();
+	}
+
 }

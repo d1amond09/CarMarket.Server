@@ -13,6 +13,8 @@ public class AddressRepository(RepositoryContext repositoryContext)
 		Create(address);
 	}
 
+	public void DeleteAddress(Address address) => Delete(address);
+
 	public Address? GetAddress(Guid countryId, Guid id, bool trackChanges) =>
 		FindByCondition(a =>
 		a.CountryId.Equals(countryId) && a.Id.Equals(id), trackChanges)

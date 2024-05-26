@@ -9,6 +9,8 @@ public class CountryRepository(RepositoryContext repositoryContext)
 {
 	public void CreateCountry(Country country) => Create(country);
 
+	public void DeleteCountry(Country country) => Delete(country);
+
 	public IEnumerable<Country> GetAllCountries(bool trackChanges) =>
 		[.. FindAll(trackChanges).OrderBy(c => c.Name)];
 
