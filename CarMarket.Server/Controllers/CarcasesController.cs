@@ -45,7 +45,7 @@ public class CarcasesController(IRepositoryManager repository,
 	}
 
 	[HttpPost]
-	public IActionResult CreateCarShop([FromBody] CarcaseForCreationDto Carcase)
+	public IActionResult CreateCarShop([FromBody] CarcaseForUpdateDto Carcase)
 	{
 		var carcaseEntity = _mapper.Map<Carcase>(Carcase);
 		_repository.Carcase.CreateCarcase(carcaseEntity);
@@ -67,4 +67,24 @@ public class CarcasesController(IRepositoryManager repository,
 		_repository.Save();
 		return NoContent();
 	}
+
+	[HttpPut("{id}")]
+	public IActionResult UpdateCarcase(Guid id, [FromBody] CarcaseForUpdateDto carcase)
+	{
+		if (carcase == null)
+		{
+			_logger.LogError("CarcaseForUpdateDto object sent from client is null.");
+			return BadRequest("CarcaseForUpdateDto object is null");
+		}
+		var carcaseEntity = _repository.Carcase.GetCarcase(id, trackChanges: true);
+		if (carcaseEntity == null)
+		{
+			_logger.LogInfo($"Carcase with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_mapper.Map(carcase, carcaseEntity);
+		_repository.Save();
+		return NoContent();
+	}
+
 }

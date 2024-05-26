@@ -7,8 +7,8 @@ using Entities.Models;
 
 namespace Entities.DataTransferObjects;
 
-public class CountryForCreationDto
+public class CountryForUpdateDto
 {
 	public string Name { get; set; }
-	public ICollection<AddressForCreationDto> Addresses { get; set; }
+	public ICollection<AddressForUpdateDto> Addresses { get; set; }
 }

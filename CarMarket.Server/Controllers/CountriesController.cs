@@ -67,7 +67,7 @@ public class CountriesController(IRepositoryManager repository,
 
 
 	[HttpPost]
-	public IActionResult CreateCarShop([FromBody] CountryForCreationDto country)
+	public IActionResult CreateCarShop([FromBody] CountryForUpdateDto country)
 	{
 		var countryEntity = _mapper.Map<Country>(country);
 		_repository.Country.CreateCountry(countryEntity);
@@ -77,7 +77,7 @@ public class CountriesController(IRepositoryManager repository,
 	}
 
 	[HttpPost("collection")]
-	public IActionResult CreateCountryCollection([FromBody] IEnumerable<CountryForCreationDto> countryCollection)
+	public IActionResult CreateCountryCollection([FromBody] IEnumerable<CountryForUpdateDto> countryCollection)
 	{
 		if (countryCollection == null)
 		{
@@ -108,5 +108,25 @@ public class CountriesController(IRepositoryManager repository,
 		_repository.Save();
 		return NoContent();
 	}
+
+	[HttpPut("{id}")]
+	public IActionResult UpdateCountry(Guid id, [FromBody] CountryForUpdateDto country)
+	{
+		if (country == null)
+		{
+			_logger.LogError("CountryForUpdateDto object sent from client is null.");
+			return BadRequest("CountryForUpdateDto object is null");
+		}
+		var countryEntity = _repository.Country.GetCountry(id, trackChanges: true);
+		if (countryEntity == null)
+		{
+			_logger.LogInfo($"Country with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_mapper.Map(country, countryEntity);
+		_repository.Save();
+		return NoContent();
+	}
+
 
 }

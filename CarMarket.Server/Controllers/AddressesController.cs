@@ -51,7 +51,7 @@ public class AddressesController(IRepositoryManager repository,
 	}
 
 	[HttpPost]
-	public IActionResult CreateAddress(Guid countryId, [FromBody] AddressForCreationDto address)
+	public IActionResult CreateAddress(Guid countryId, [FromBody] AddressForUpdateDto address)
 	{
 		if (address == null)
 		{
@@ -93,5 +93,32 @@ public class AddressesController(IRepositoryManager repository,
 		_repository.Save();
 		return NoContent();
 	}
+
+	[HttpPut("{id}")]
+	public IActionResult UpdateAddressForCountry(Guid countryId, Guid id, 
+		[FromBody] AddressForUpdateDto address)
+	{
+		if (address == null)
+		{
+			_logger.LogError("AddressForUpdateDto object sent from client is null.");
+			return BadRequest("AddressForUpdateDto object is null");
+		}
+		var country = _repository.Country.GetCountry(countryId, trackChanges: false);
+		if (country == null)
+		{
+			_logger.LogInfo($"Country with id: {countryId} doesn't exist in the database.");
+			return NotFound();
+		}
+		var addressEntity = _repository.Address.GetAddress(countryId, id, trackChanges: true);
+		if (addressEntity == null)
+		{
+			_logger.LogInfo($"Address with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_mapper.Map(address, addressEntity);
+		_repository.Save();
+		return NoContent();
+	}
+
 
 }

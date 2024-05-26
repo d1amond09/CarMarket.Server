@@ -22,7 +22,7 @@ public class Program
 
 		var app = builder.Build();
 
-		ConfigureApp(app, app.Services, app.Environment);
+		ConfigureApp(app);
 
 		app.MapControllers();
 
@@ -47,10 +47,8 @@ public class Program
 
 	}
 
-	public static void ConfigureApp(IApplicationBuilder app, IServiceProvider servicesProvider, IWebHostEnvironment environment)
+	public static void ConfigureApp(IApplicationBuilder app)
 	{
-		/*if (environment.IsDevelopment()) app.UseDeveloperExceptionPage();
-		else app.UseHsts();*/
 
 		app.ConfigureExceptionMiddleware();
 		app.UseHttpsRedirection();

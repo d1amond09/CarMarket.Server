@@ -45,7 +45,7 @@ public class BrandsController(IRepositoryManager repository,
 	}
 
 	[HttpPost]
-	public IActionResult CreateCarShop([FromBody] BrandForCreationDto brand)
+	public IActionResult CreateCarShop([FromBody] BrandForUpdateDto brand)
 	{
 		var brandEntity = _mapper.Map<Brand>(brand);
 		_repository.Brand.CreateBrand(brandEntity);
@@ -64,6 +64,25 @@ public class BrandsController(IRepositoryManager repository,
 			return NotFound();
 		}
 		_repository.Brand.DeleteBrand(brand);
+		_repository.Save();
+		return NoContent();
+	}
+
+	[HttpPut("{id}")]
+	public IActionResult UpdateBrand(Guid id, [FromBody] BrandForUpdateDto brand)
+	{
+		if (brand == null)
+		{
+			_logger.LogError("BrandForUpdateDto object sent from client is null.");
+			return BadRequest("BrandForUpdateDto object is null");
+		}
+		var brandEntity = _repository.Brand.GetBrand(id, trackChanges: true);
+		if (brandEntity == null)
+		{
+			_logger.LogInfo($"Brand with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_mapper.Map(brand, brandEntity);
 		_repository.Save();
 		return NoContent();
 	}

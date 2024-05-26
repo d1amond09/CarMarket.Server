@@ -47,7 +47,7 @@ public class CarShopsController(IRepositoryManager repository,
 	}
 
 	[HttpPost("{addressId}")]
-	public IActionResult CreateCarShop(Guid addressId, [FromBody] CarShopForCreationDto carShop)
+	public IActionResult CreateCarShop(Guid addressId, [FromBody] CarShopForUpdateDto carShop)
 	{
 		if (carShop == null)
 		{
@@ -79,6 +79,25 @@ public class CarShopsController(IRepositoryManager repository,
 			return NotFound();
 		}
 		_repository.CarShop.DeleteCarShop(carShop);
+		_repository.Save();
+		return NoContent();
+	}
+
+	[HttpPut("{id}")]
+	public IActionResult UpdateCarShop(Guid id, [FromBody] CarShopForUpdateDto carShop)
+	{
+		if (carShop == null)
+		{
+			_logger.LogError("CarShopForUpdateDto object sent from client is null.");
+			return BadRequest("CarShopForUpdateDto object is null");
+		}
+		var carShopEntity = _repository.CarShop.GetCarShop(id, trackChanges: true);
+		if (carShopEntity == null)
+		{
+			_logger.LogInfo($"CarShop with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		_mapper.Map(carShop, carShopEntity);
 		_repository.Save();
 		return NoContent();
 	}
