@@ -5,13 +5,9 @@ namespace CarMarket.Server.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class WeatherForecastController : ControllerBase
+	public class WeatherForecastController(IRepositoryManager repository) : ControllerBase
 	{
-		private readonly IRepositoryManager _repository;
-		public WeatherForecastController(IRepositoryManager repository)
-		{
-			_repository = repository;
-		}
+		private readonly IRepositoryManager _repository = repository;
 
 		[HttpGet]
 		public ActionResult<IEnumerable<string>> Get()

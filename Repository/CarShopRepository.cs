@@ -6,12 +6,13 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Repository;
 
-public class CarShopRepository : RepositoryBase<CarShop>, ICarShopRepository
+public class CarShopRepository(RepositoryContext repositoryContext) 
+	: RepositoryBase<CarShop>(repositoryContext), ICarShopRepository
 {
-	public CarShopRepository(RepositoryContext repositoryContext)
-	: base(repositoryContext)
+	public void CreateCarShop(Guid addressId, CarShop carShop)
 	{
-
+		carShop.AddressId = addressId;
+		Create(carShop);
 	}
 
 	public IEnumerable<CarShop> GetAllCarShops(bool trackChanges) =>

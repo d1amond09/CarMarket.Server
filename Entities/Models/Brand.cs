@@ -12,5 +12,5 @@ public class Brand
 	[Required(ErrorMessage = "Brand name is a required field.")]
 	[MaxLength(100, ErrorMessage = "Maximum length for the Name is 100 characters.")]
 	public string Name { get; set; } = "";
-
+	public ICollection<Car> Cars { get; set; }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Entities.Models;
 
 namespace Entities;
 
@@ -10,6 +11,7 @@ public class Country
 
 	[Required(ErrorMessage = "Country name is a required field.")]
 	[MaxLength(60, ErrorMessage = "Maximum length for the Name is 60 characters.")]
-	public string Name { get; set; } = "";
+	public string Name { get; set; }
 
+	public ICollection<Address> Addresses { get; set; }
 }

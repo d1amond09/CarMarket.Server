@@ -7,16 +7,10 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace CarMarket.Server.Helpers;
 
-public class ErrorExceptionMiddleware
+public class ErrorExceptionMiddleware(RequestDelegate next, ILoggerManager logger)
 {
-	private readonly RequestDelegate _next;
-	private readonly ILoggerManager _logger;
-
-	public ErrorExceptionMiddleware(RequestDelegate next, ILoggerManager logger)
-	{
-		_logger = logger;
-		_next = next;
-	}
+	private readonly RequestDelegate _next = next;
+	private readonly ILoggerManager _logger = logger;
 
 	public async Task InvokeAsync(HttpContext httpContext)
 	{

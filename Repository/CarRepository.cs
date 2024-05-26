@@ -5,11 +5,15 @@ using Entities.Models;
 
 namespace Repository;
 
-public class CarRepository : RepositoryBase<Car>, ICarRepository
+public class CarRepository(RepositoryContext repositoryContext) 
+	: RepositoryBase<Car>(repositoryContext), ICarRepository
 {
-	public CarRepository(RepositoryContext repositoryContext)
-	: base(repositoryContext)
+	public void CreateCar(Guid carShopId, Guid brandId, Guid carcaseId, Car car)
 	{
+		car.CarShopId = carShopId;
+		car.BrandId = brandId;
+		car.CarcaseId = carcaseId;
+		Create(car);
 	}
 
 	public Car? GetCar(Guid carShopId, Guid id, bool trackChanges) =>
