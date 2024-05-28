@@ -3,6 +3,7 @@ using Contracts;
 using Entities;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarMarket.Server.Controllers;
@@ -133,6 +134,34 @@ public class CarsController(IRepositoryManager repository,
 			return NotFound();
 		}
 		_mapper.Map(car, carEntity);
+		_repository.Save();
+		return NoContent();
+	}
+
+	[HttpPatch("{id}")]
+	public IActionResult PartiallyUpdateCarForCarShop(Guid carShopId, Guid id, 
+		[FromBody] JsonPatchDocument<CarForUpdateDto> patchDoc)
+	{
+		if (patchDoc == null)
+		{
+			_logger.LogError("patchDoc object sent from client is null.");
+			return BadRequest("patchDoc object is null");
+		}
+		var company = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
+		if (company == null)
+		{
+			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
+			return NotFound();
+		}
+		var carEntity = _repository.Car.GetCar(carShopId, id, trackChanges: true);
+		if (carEntity == null)
+		{
+			_logger.LogInfo($"Car with id: {id} doesn't exist in the database.");
+			return NotFound();
+		}
+		var employeeToPatch = _mapper.Map<CarForUpdateDto>(carEntity);
+		patchDoc.ApplyTo(employeeToPatch);
+		_mapper.Map(employeeToPatch, carEntity);
 		_repository.Save();
 		return NoContent();
 	}

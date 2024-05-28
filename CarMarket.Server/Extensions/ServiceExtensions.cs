@@ -50,7 +50,7 @@ public static class ServiceExtensions
 
 		services.AddAutoMapper(x => x.CreateMap<Car, CarDto>());
 		services.AddAutoMapper(x => x.CreateMap<CarForCreationDto, Car>());
-		services.AddAutoMapper(x => x.CreateMap<CarForUpdateDto, Car>());
+		services.AddAutoMapper(x => x.CreateMap<CarForUpdateDto, Car>().ReverseMap());
 
 		services.AddAutoMapper(x => x.CreateMap<Address, AddressDto>());
 		services.AddAutoMapper(x => x.CreateMap<AddressForCreationDto, Address>());
