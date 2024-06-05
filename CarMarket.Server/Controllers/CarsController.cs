@@ -25,6 +25,9 @@ public class CarsController(IRepositoryManager repository,
 	[HttpGet]
 	public async Task<IActionResult> GetCarsForCarShop(Guid carShopId, [FromQuery] CarParameters carParameters)
 	{
+		if (!carParameters.ValidAgeRange)
+			return BadRequest("Max price can't be less than min price.");
+
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
 		if (carShop == null)
 		{
