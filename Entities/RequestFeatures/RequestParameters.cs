@@ -23,6 +23,7 @@ public abstract class RequestParameters
 		}
 	}
 	public string OrderBy { get; set; } = string.Empty;
+	public string Fields { get; set; } = string.Empty;
 }
 
 

@@ -1,6 +1,7 @@
 using CarMarket.Server.ActionFilters;
 using CarMarket.Server.Extensions;
 using CarMarket.Server.Helpers;
+using CarMarket.Server.Utility;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Repository.DataShaping;
 
 namespace CarMarket.Server;
 
@@ -42,6 +44,9 @@ public class Program
 		services.AddScoped<ValidationFilterAttribute>();
 		services.AddScoped<ValidateCarShopExistsAttribute>();
 		services.AddScoped<ValidateCarForCarShopExistsAttribute>();
+		services.AddScoped<IDataShaper<CarDto>, DataShaper<CarDto>>();
+		services.AddScoped<ValidateMediaTypeAttribute>();
+		services.AddScoped<CarLinks>();
 
 
 
@@ -53,6 +58,7 @@ public class Program
 		.AddXmlDataContractSerializerFormatters()
 		.AddCustomCSVFormatter();
 
+		services.AddCustomMediaTypes();
 	}
 
 	public static void ConfigureApp(IApplicationBuilder app)

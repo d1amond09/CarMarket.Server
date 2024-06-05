@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Design;
 using AutoMapper;
 using CarMarket.Server.ActionFilters;
+using CarMarket.Server.Utility;
 using Contracts;
 using Entities;
 using Entities.DataTransferObjects;
@@ -14,15 +15,20 @@ namespace CarMarket.Server.Controllers;
 
 [Route("api/carShops/{carShopId}/cars")]
 [ApiController]
-public class CarsController(IRepositoryManager repository, 
+public class CarsController(CarLinks carLinks,
+							IDataShaper<CarDto> dataShaper,
+							IRepositoryManager repository, 
 							ILoggerManager logger, 
 							IMapper mapper) : ControllerBase
 {
+	private readonly CarLinks _carLinks = carLinks;
+	private readonly IDataShaper<CarDto> _dataShaper = dataShaper;
 	private readonly IRepositoryManager _repository = repository;
 	private readonly ILoggerManager _logger = logger;
 	private readonly IMapper _mapper = mapper;
 
 	[HttpGet]
+	[ServiceFilter(typeof(ValidateMediaTypeAttribute))]
 	public async Task<IActionResult> GetCarsForCarShop(Guid carShopId, [FromQuery] CarParameters carParameters)
 	{
 		if (!carParameters.ValidAgeRange)
@@ -39,11 +45,13 @@ public class CarsController(IRepositoryManager repository,
 		Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(carsFromDb.MetaData));
 
 		var carsDto = _mapper.Map<IEnumerable<CarDto>>(carsFromDb);
-		return Ok(carsDto);
+
+		var links = _carLinks.TryGenerateLinks(carsDto, carParameters.Fields, carShopId, HttpContext);
+		return links.HasLinks ? Ok(links.LinkedEntities) : Ok(links.ShapedEntities);
 	}
 
 	[HttpGet("{id}", Name = "GetCarById")]
-	public async Task<IActionResult> GetCarForCompany(Guid carShopId, Guid id)
+	public async Task<IActionResult> GetCarForCarShop(Guid carShopId, Guid id)
 	{
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
 		if (carShop == null)
@@ -64,7 +72,7 @@ public class CarsController(IRepositoryManager repository,
 
 	[HttpPost]
 	[ServiceFilter(typeof(ValidationFilterAttribute))]
-	public async Task<IActionResult> CreateCar(Guid carShopId, [FromBody] CarForManipulationDto car)
+	public async Task<IActionResult> CreateCarForCarShop(Guid carShopId, [FromBody] CarForManipulationDto car)
 	{
 		var carShop = await _repository.CarShop.GetCarShopAsync(carShopId, trackChanges: false);
 		if (carShop == null)

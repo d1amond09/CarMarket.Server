@@ -8,6 +8,7 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using CarMarket.Server.Formatters.Output;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace CarMarket.Server.Extensions;
 
@@ -63,5 +64,23 @@ public static class ServiceExtensions
 		{
 			options.SuppressModelStateInvalidFilter = true;
 		});
+
+	public static void AddCustomMediaTypes(this IServiceCollection services)
+	{
+		services.Configure<MvcOptions>(config =>
+		{
+			var newtonsoftJsonOutputFormatter = config.OutputFormatters
+				.OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+			newtonsoftJsonOutputFormatter?.SupportedMediaTypes
+				.Add("application/vnd.codemaze.hateoas+json");
+
+			var xmlOutputFormatter = config.OutputFormatters
+				.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
+
+			xmlOutputFormatter?.SupportedMediaTypes
+				.Add("application/vnd.codemaze.hateoas+xml");
+		});
+	}
 
 }
