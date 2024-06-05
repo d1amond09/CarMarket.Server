@@ -1,11 +1,14 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.Design;
+using AutoMapper;
 using CarMarket.Server.ActionFilters;
 using Contracts;
 using Entities;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CarMarket.Server.Controllers;
 
@@ -20,7 +23,7 @@ public class CarsController(IRepositoryManager repository,
 	private readonly IMapper _mapper = mapper;
 
 	[HttpGet]
-	public async Task<IActionResult> GetCarsForCarShop(Guid carShopId)
+	public async Task<IActionResult> GetCarsForCarShop(Guid carShopId, [FromQuery] CarParameters carParameters)
 	{
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
 		if (carShop == null)
@@ -28,7 +31,9 @@ public class CarsController(IRepositoryManager repository,
 			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
 			return NotFound();
 		}
-		var carsFromDb = await _repository.Car.GetCarsAsync(carShopId, trackChanges: false);
+		var carsFromDb = await _repository.Car.GetCarsAsync(carShopId, carParameters, trackChanges: false);
+
+		Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(carsFromDb.MetaData));
 
 		var carsDto = _mapper.Map<IEnumerable<CarDto>>(carsFromDb);
 		return Ok(carsDto);
