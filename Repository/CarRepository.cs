@@ -5,6 +5,7 @@ using Entities;
 using Entities.Models;
 using Entities.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 
 namespace Repository;
 
@@ -36,10 +37,9 @@ public class CarRepository(RepositoryContext repositoryContext)
 
 	public async Task<PagedList<Car>> GetCarsAsync(Guid carShopId, CarParameters carParameters, bool trackChanges)
 	{
-		var cars = await FindByCondition(e => 
-			e.CarShopId.Equals(carShopId) && 
-			(e.Price >= carParameters.MinPrice && 
-			e.Price <= carParameters.MaxPrice), trackChanges)
+		var cars = await FindByCondition(e => e.CarShopId.Equals(carShopId), trackChanges)
+				.FilterCars(carParameters.MinPrice, carParameters.MaxPrice)
+				.Search(carParameters.SearchTerm)
 				.OrderBy(e => e.Name)
 				.Skip((carParameters.PageNumber - 1) * carParameters.PageSize)
 				.Take(carParameters.PageSize)
