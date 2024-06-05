@@ -40,7 +40,7 @@ public class CarRepository(RepositoryContext repositoryContext)
 		var cars = await FindByCondition(e => e.CarShopId.Equals(carShopId), trackChanges)
 				.FilterCars(carParameters.MinPrice, carParameters.MaxPrice)
 				.Search(carParameters.SearchTerm)
-				.OrderBy(e => e.Name)
+				.Sort(carParameters.OrderBy)
 				.Skip((carParameters.PageNumber - 1) * carParameters.PageSize)
 				.Take(carParameters.PageSize)
 				.ToListAsync();

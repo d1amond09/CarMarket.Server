@@ -12,5 +12,8 @@ public class CarParameters : RequestParameters
 	public double MaxPrice { get; set; } = double.MaxValue;
 	public bool ValidAgeRange => MaxPrice > MinPrice;
 	public string SearchTerm { get; set; } = string.Empty;
-
+    public CarParameters()
+    {
+		OrderBy = "name";
+    }
 }
