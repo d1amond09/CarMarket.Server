@@ -22,6 +22,16 @@ public class CarShopsController(IRepositoryManager repository,
 	private readonly ILoggerManager _logger = logger;
 	private readonly IMapper _mapper = mapper;
 
+
+
+	[HttpOptions]
+	public IActionResult GetCarShopsOptions()
+	{
+		Response.Headers.Append("Allow", "GET, OPTIONS, POST");
+		return Ok();
+	}
+
+
 	[HttpGet]
 	public async Task<IActionResult> GetCarShops()
 	{

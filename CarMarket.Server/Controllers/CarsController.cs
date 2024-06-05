@@ -28,6 +28,7 @@ public class CarsController(CarLinks carLinks,
 	private readonly IMapper _mapper = mapper;
 
 	[HttpGet]
+	[HttpHead]
 	[ServiceFilter(typeof(ValidateMediaTypeAttribute))]
 	public async Task<IActionResult> GetCarsForCarShop(Guid carShopId, [FromQuery] CarParameters carParameters)
 	{
