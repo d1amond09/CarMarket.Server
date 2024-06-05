@@ -15,16 +15,15 @@ public class CarForManipulationDto
 
 	[Required(ErrorMessage = "Car Price is a required field.")]
 	[Range(0, int.MaxValue, ErrorMessage = "Price is required and it can't be lower than 0")]
-	public double Price { get; set; }
+	public double Price { get; set; } = 0;
 
 	[Required(ErrorMessage = "Car Year is a required field.")]
-	[MaxLength(4, ErrorMessage = "Maximum length for the Name is 4 characters.")]
-	[MinLength(4, ErrorMessage = "Minimum length for the Name is 4 characters.")]
-	public string Year { get; set; }
+	[Range(1800, 9999, ErrorMessage = "Price is required and it can't be lower than 1900")]
+	public int Year { get; set; } = 2000;
 
 	[Required(ErrorMessage = "Brand name is a required field.")]
 	[MaxLength(50, ErrorMessage = "Maximum length for the Brand is 50 characters.")]
-	public string Brand { get; set; }
+	public string Brand { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Carcase name is a required field.")]
 	[MaxLength(150, ErrorMessage = "Maximum length for the Carcase is 150 characters.")]

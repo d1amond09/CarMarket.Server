@@ -4,6 +4,6 @@ public interface IRepositoryManager
 {
 	ICarRepository Car { get; }
 	ICarShopRepository CarShop { get; }
-	void Save();
+	Task SaveAsync();
 }
 

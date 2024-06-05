@@ -8,6 +8,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Entities.Models;
 using System.ComponentModel.Design;
 using CarMarket.Server.ModelBinders;
+using CarMarket.Server.ActionFilters;
 
 namespace CarMarket.Server.Controllers;
 
@@ -22,9 +23,9 @@ public class CarShopsController(IRepositoryManager repository,
 	private readonly IMapper _mapper = mapper;
 
 	[HttpGet]
-	public IActionResult GetCarShops()
+	public async Task<IActionResult> GetCarShops()
 	{
-		var carShops = _repository.CarShop.GetAllCarShops(trackChanges: false);
+		var carShops = await _repository.CarShop.GetAllCarShopsAsync(trackChanges: false);
 
 		var carShopsDto = _mapper.Map<IEnumerable<CarShopDto>>(carShops);
 
@@ -32,9 +33,9 @@ public class CarShopsController(IRepositoryManager repository,
 	}
 
 	[HttpGet("{id}", Name = "GetCarShopById")]
-	public IActionResult GetCarShop(Guid id)
+	public async Task<IActionResult> GetCarShop(Guid id)
 	{
-		var carShop = _repository.CarShop.GetCarShop(id, trackChanges: false);
+		var carShop = await _repository.CarShop.GetCarShopAsync(id, trackChanges: false);
 		if (carShop == null)
 		{
 			_logger.LogInfo($"CarShop with id: {id} doesn't exist in the database.");
@@ -48,14 +49,14 @@ public class CarShopsController(IRepositoryManager repository,
 	}
 
 	[HttpGet("collection/({ids})", Name = "CarShopCollection")]
-	public IActionResult GetCarShopCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
+	public async Task<IActionResult> GetCarShopCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
 	{
 		if (ids == null)
 		{
 			_logger.LogError("Parameter ids is null");
 			return BadRequest("Parameter ids is null");
 		}
-		var companyEntities = _repository.CarShop.GetByIds(ids, trackChanges: false);
+		var companyEntities = await _repository.CarShop.GetByIdsAsync(ids, trackChanges: false);
 		if (ids.Count() != companyEntities.Count())
 		{
 			_logger.LogError("Some ids are not valid in a collection");
@@ -65,31 +66,21 @@ public class CarShopsController(IRepositoryManager repository,
 		return Ok(companiesToReturn);
 	}
 
-
 	[HttpPost]
-	public IActionResult CreateCarShop([FromBody] CarShopForManipulationDto carShop)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	public async Task<IActionResult> CreateCarShop([FromBody] CarShopForManipulationDto carShop)
 	{
-		if (carShop == null)
-		{
-			_logger.LogError("CarShopForCreationDto object sent from client is null.");
-			return BadRequest("CarShopForCreationDto object is null");
-		}
-
-		if (!ModelState.IsValid)
-		{
-			_logger.LogError("Invalid model state for the CarShopForCreationDto object");
-			return UnprocessableEntity(ModelState);
-		}
-
 		var carShopEntity = _mapper.Map<CarShop>(carShop);
 		_repository.CarShop.CreateCarShop(carShopEntity);
-		_repository.Save();
+
+		await _repository.SaveAsync();
+
 		var carShopToReturn = _mapper.Map<CarShopDto>(carShopEntity);
 		return CreatedAtRoute("GetCarShopById", new { id = carShopToReturn.Id }, carShopToReturn);
 	}
 
 	[HttpPost("collection")]
-	public IActionResult CreatecarShopCollection([FromBody] IEnumerable<CarShopForCreationDto> carShopCollection)
+	public async Task<IActionResult> CreatecarShopCollection([FromBody] IEnumerable<CarShopForCreationDto> carShopCollection)
 	{
 		if (carShopCollection == null)
 		{
@@ -101,9 +92,8 @@ public class CarShopsController(IRepositoryManager repository,
 		{
 			_repository.CarShop.CreateCarShop(company);
 		}
-		_repository.Save();
-		var carShopCollectionToReturn =
-	   _mapper.Map<IEnumerable<CarShopDto>>(companyEntities);
+		await _repository.SaveAsync();
+		var carShopCollectionToReturn = _mapper.Map<IEnumerable<CarShopDto>>(companyEntities);
 		var ids = string.Join(",", carShopCollectionToReturn.Select(c => c.Id));
 		return CreatedAtRoute("carShopCollection", new { ids },
 	   carShopCollectionToReturn);
@@ -111,35 +101,29 @@ public class CarShopsController(IRepositoryManager repository,
 
 
 	[HttpDelete("{id}")]
-	public IActionResult DeleteCarShop(Guid id)
+	[ServiceFilter(typeof(ValidateCarShopExistsAttribute))]
+	public async Task<IActionResult> DeleteCarShop(Guid id)
 	{
-		var carShop = _repository.CarShop.GetCarShop(id, trackChanges: false);
-		if (carShop == null)
+		if(HttpContext.Items["carShop"] is CarShop carShop)
 		{
-			_logger.LogInfo($"CarShop with id: {id} doesn't exist in the database.");
-			return NotFound();
+			_repository.CarShop.DeleteCarShop(carShop);
+		
+			await _repository.SaveAsync();
 		}
-		_repository.CarShop.DeleteCarShop(carShop);
-		_repository.Save();
 		return NoContent();
 	}
 
 	[HttpPut("{id}")]
-	public IActionResult UpdateCarShop(Guid id, [FromBody] CarShopForUpdateDto carShop)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	[ServiceFilter(typeof(ValidateCarShopExistsAttribute))]
+	public async Task<IActionResult> UpdateCarShop(Guid id, [FromBody] CarShopForUpdateDto carShop)
 	{
-		if (carShop == null)
+		if (HttpContext.Items["carShop"] is CarShop carShopEntity)
 		{
-			_logger.LogError("CarShopForUpdateDto object sent from client is null.");
-			return BadRequest("CarShopForUpdateDto object is null");
+			_mapper.Map(carShop, carShopEntity);
+
+			await _repository.SaveAsync();
 		}
-		var carShopEntity = _repository.CarShop.GetCarShop(id, trackChanges: true);
-		if (carShopEntity == null)
-		{
-			_logger.LogInfo($"CarShop with id: {id} doesn't exist in the database.");
-			return NotFound();
-		}
-		_mapper.Map(carShop, carShopEntity);
-		_repository.Save();
 		return NoContent();
 	}
 }

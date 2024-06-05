@@ -1,3 +1,4 @@
+using CarMarket.Server.ActionFilters;
 using CarMarket.Server.Extensions;
 using CarMarket.Server.Helpers;
 using Contracts;
@@ -38,6 +39,11 @@ public class Program
 		services.ConfigureRepositoryManager();
 		services.ConfigureAutoMapping();
 		services.ConfigureApiBehaviorOptions();
+		services.AddScoped<ValidationFilterAttribute>();
+		services.AddScoped<ValidateCarShopExistsAttribute>();
+		services.AddScoped<ValidateCarForCarShopExistsAttribute>();
+
+
 
 		services.AddControllers(config =>
 		{

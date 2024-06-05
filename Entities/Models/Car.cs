@@ -21,11 +21,11 @@ public class Car
 
 	[Required(ErrorMessage = "Brand name is a required field.")]
 	[MaxLength(50, ErrorMessage = "Maximum length for the Brand is 50 characters.")]
-	public string Brand { get; set; }
+	public string Brand { get; set; } = "";
 
 	[Required(ErrorMessage = "Carcase name is a required field.")]
 	[MaxLength(150, ErrorMessage = "Maximum length for the Carcase is 150 characters.")]
-	public string Carcase { get; set; } 
+	public string Carcase { get; set; } = "";
 
 	[ForeignKey(nameof(CarShop))]
 	public Guid CarShopId { get; set; }

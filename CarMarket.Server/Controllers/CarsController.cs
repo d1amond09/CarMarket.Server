@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CarMarket.Server.ActionFilters;
 using Contracts;
 using Entities;
 using Entities.DataTransferObjects;
@@ -19,7 +20,7 @@ public class CarsController(IRepositoryManager repository,
 	private readonly IMapper _mapper = mapper;
 
 	[HttpGet]
-	public IActionResult GetCarsForCarShop(Guid carShopId)
+	public async Task<IActionResult> GetCarsForCarShop(Guid carShopId)
 	{
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
 		if (carShop == null)
@@ -27,14 +28,14 @@ public class CarsController(IRepositoryManager repository,
 			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
 			return NotFound();
 		}
-		var carsFromDb = _repository.Car.GetCars(carShopId, trackChanges: false);
+		var carsFromDb = await _repository.Car.GetCarsAsync(carShopId, trackChanges: false);
 
 		var carsDto = _mapper.Map<IEnumerable<CarDto>>(carsFromDb);
 		return Ok(carsDto);
 	}
 
 	[HttpGet("{id}", Name = "GetCarById")]
-	public IActionResult GetCarForCompany(Guid carShopId, Guid id)
+	public async Task<IActionResult> GetCarForCompany(Guid carShopId, Guid id)
 	{
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
 		if (carShop == null)
@@ -43,7 +44,7 @@ public class CarsController(IRepositoryManager repository,
 			return NotFound();
 		}
 
-		var carFromDb = _repository.Car.GetCar(carShopId, id, trackChanges: false);
+		var carFromDb = await _repository.Car.GetCarAsync(carShopId, id, trackChanges: false);
 		if (carFromDb == null)
 		{
 			_logger.LogInfo($"Car with id: {id} doesn't exist in the database.");
@@ -54,21 +55,10 @@ public class CarsController(IRepositoryManager repository,
 	}
 
 	[HttpPost]
-	public IActionResult CreateCarShop(Guid carShopId, [FromBody] CarForManipulationDto car)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	public async Task<IActionResult> CreateCar(Guid carShopId, [FromBody] CarForManipulationDto car)
 	{
-		if (car == null)
-		{
-			_logger.LogError("CarForCreationDto object sent from client is null.");
-			return BadRequest("CarForCreationDto object is null");
-		}
-
-		if (!ModelState.IsValid)
-		{
-			_logger.LogError("Invalid model state for the CarForCreationDto object");
-			return UnprocessableEntity(ModelState);
-		}
-
-		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
+		var carShop = await _repository.CarShop.GetCarShopAsync(carShopId, trackChanges: false);
 		if (carShop == null)
 		{
 			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
@@ -77,62 +67,42 @@ public class CarsController(IRepositoryManager repository,
 
 		var carEntity = _mapper.Map<Car>(car);
 		_repository.Car.CreateCar(carShopId, carEntity);
-		_repository.Save();
+		await _repository.SaveAsync();
 		var carToReturn = _mapper.Map<CarDto>(carEntity);
 		return CreatedAtRoute("GetCarById", new { carShopId, id = carToReturn.Id }, carToReturn);
 	}
 
 	[HttpDelete("{id}")]
-	public IActionResult DeleteCarcase(Guid carShopId, Guid id)
+	[ServiceFilter(typeof(ValidateCarForCarShopExistsAttribute))]
+	public async Task<IActionResult> DeleteCarForCarShop(Guid carShopId, Guid id)
 	{
-		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
-		if (carShop == null)
+		if (HttpContext.Items["car"] is Car car)
 		{
-			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
-			return NotFound();
+			_repository.Car.DeleteCar(car);
+			await _repository.SaveAsync();
 		}
 
-		var car = _repository.Car.GetCar(carShopId, id, trackChanges: false);
-		if (car == null)
-		{
-			_logger.LogInfo($"Car with id: {id} doesn't exist in the database.");
-			return NotFound();
-		}
-		_repository.Car.DeleteCar(car);
-		_repository.Save();
 		return NoContent();
 	}
 
 	[HttpPut("{id}")]
-	public IActionResult UpdateCarForCarShop(Guid carShopId, Guid id,
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	[ServiceFilter(typeof(ValidateCarForCarShopExistsAttribute))]
+	public async Task<IActionResult> UpdateCarForCarShop(Guid carShopId, Guid id,
 		[FromBody] CarForUpdateDto car)
 	{
-		if (car == null)
+		if (HttpContext.Items["car"] is Car carEntity)
 		{
-			_logger.LogError("CarForUpdateDto object sent from client is null.");
-			return BadRequest("CarForUpdateDto object is null");
+			_mapper.Map(car, carEntity);
+			await _repository.SaveAsync();
 		}
 
-		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
-		if (carShop == null)
-		{
-			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
-			return NotFound();
-		}
-
-		var carEntity = _repository.Car.GetCar(carShopId, id, trackChanges: true);
-		if (carEntity == null)
-		{
-			_logger.LogInfo($"Car with id: {id} doesn't exist in the database.");
-			return NotFound();
-		}
-		_mapper.Map(car, carEntity);
-		_repository.Save();
 		return NoContent();
 	}
 
 	[HttpPatch("{id}")]
-	public IActionResult PartiallyUpdateCarForCarShop(Guid carShopId, Guid id, 
+	[ServiceFilter(typeof(ValidateCarForCarShopExistsAttribute))]
+	public async Task<IActionResult> PartiallyUpdateCarForCarShop(Guid carShopId, Guid id, 
 		[FromBody] JsonPatchDocument<CarForUpdateDto> patchDoc)
 	{
 		if (patchDoc == null)
@@ -140,22 +110,22 @@ public class CarsController(IRepositoryManager repository,
 			_logger.LogError("patchDoc object sent from client is null.");
 			return BadRequest("patchDoc object is null");
 		}
-		var company = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
-		if (company == null)
+
+		if (HttpContext.Items["car"] is Car carEntity)
 		{
-			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
-			return NotFound();
+			var employeeToPatch = _mapper.Map<CarForUpdateDto>(carEntity);
+			patchDoc.ApplyTo(employeeToPatch);
+			TryValidateModel(employeeToPatch);
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the patch document");
+				return UnprocessableEntity(ModelState);
+			}
+
+			_mapper.Map(employeeToPatch, carEntity);
+			await _repository.SaveAsync();
 		}
-		var carEntity = _repository.Car.GetCar(carShopId, id, trackChanges: true);
-		if (carEntity == null)
-		{
-			_logger.LogInfo($"Car with id: {id} doesn't exist in the database.");
-			return NotFound();
-		}
-		var employeeToPatch = _mapper.Map<CarForUpdateDto>(carEntity);
-		patchDoc.ApplyTo(employeeToPatch);
-		_mapper.Map(employeeToPatch, carEntity);
-		_repository.Save();
+	
 		return NoContent();
 	}
 }

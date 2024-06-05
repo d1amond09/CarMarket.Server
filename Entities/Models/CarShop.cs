@@ -24,5 +24,5 @@ public class CarShop
 	[MaxLength(20, ErrorMessage = "Maximum length for the Name is 20 characters.")]
 	public string Phone { get; set; } = "";
 
-	public ICollection<Car> Cars { get; set; }
+	public ICollection<Car> Cars { get; set; } = [];
 }

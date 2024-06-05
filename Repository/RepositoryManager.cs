@@ -6,26 +6,16 @@ namespace Repository;
 public class RepositoryManager(RepositoryContext repositoryContext) : IRepositoryManager
 {
 	private readonly RepositoryContext _repositoryContext = repositoryContext;
-	private ICarRepository _carRepository;
-	private ICarShopRepository _carShopRepository;
+	private ICarRepository? _carRepository;
+	private ICarShopRepository? _carShopRepository;
 
-	public ICarRepository Car
-	{
-		get
-		{
+	public ICarRepository Car =>
 			_carRepository ??= new CarRepository(_repositoryContext);
-			return _carRepository;
-		}
-	}
 
-	public ICarShopRepository CarShop
-	{
-		get
-		{
+
+	public ICarShopRepository CarShop =>
 			_carShopRepository ??= new CarShopRepository(_repositoryContext);
-			return _carShopRepository;
-		}
-	}
 
-	public void Save() => _repositoryContext.SaveChanges();
+
+	public Task SaveAsync() => _repositoryContext.SaveChangesAsync();
 }

@@ -2,6 +2,7 @@
 using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository;
 
@@ -25,5 +26,15 @@ public class CarRepository(RepositoryContext repositoryContext)
 		FindByCondition(e => 
 		e.CarShopId.Equals(carShopId), trackChanges)
 			.OrderBy(e => e.Name);
+
+	public async Task<Car?> GetCarAsync(Guid carShopId, Guid id, bool trackChanges) =>
+		await FindByCondition(e =>
+		e.CarShopId.Equals(carShopId) && e.Id.Equals(id), trackChanges)
+			.SingleOrDefaultAsync();
+
+	public async Task<IEnumerable<Car>> GetCarsAsync(Guid carShopId, bool trackChanges) =>
+		await FindByCondition(e =>
+		e.CarShopId.Equals(carShopId), trackChanges)
+			.OrderBy(e => e.Name).ToListAsync();
 
 }
