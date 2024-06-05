@@ -9,9 +9,8 @@ namespace Repository;
 public class CarShopRepository(RepositoryContext repositoryContext) 
 	: RepositoryBase<CarShop>(repositoryContext), ICarShopRepository
 {
-	public void CreateCarShop(Guid addressId, CarShop carShop)
+	public void CreateCarShop(CarShop carShop)
 	{
-		carShop.AddressId = addressId;
 		Create(carShop);
 	}
 
@@ -23,5 +22,8 @@ public class CarShopRepository(RepositoryContext repositoryContext)
 	public CarShop? GetCarShop(Guid carShopId, bool trackChanges) =>
 		FindByCondition(c => c.Id.Equals(carShopId), trackChanges)
 		.SingleOrDefault();
+
+	public IEnumerable<CarShop> GetByIds(IEnumerable<Guid> ids, bool trackChanges) =>
+		[.. FindByCondition(x => ids.Contains(x.Id), trackChanges)];
 
 }

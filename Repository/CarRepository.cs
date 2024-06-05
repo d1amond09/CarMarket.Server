@@ -8,11 +8,9 @@ namespace Repository;
 public class CarRepository(RepositoryContext repositoryContext) 
 	: RepositoryBase<Car>(repositoryContext), ICarRepository
 {
-	public void CreateCar(Guid carShopId, Guid brandId, Guid carcaseId, Car car)
+	public void CreateCar(Guid carShopId, Car car)
 	{
 		car.CarShopId = carShopId;
-		car.BrandId = brandId;
-		car.CarcaseId = carcaseId;
 		Create(car);
 	}
 

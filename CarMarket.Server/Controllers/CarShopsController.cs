@@ -7,6 +7,7 @@ using CarMarket.Server.Exceptions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Entities.Models;
 using System.ComponentModel.Design;
+using CarMarket.Server.ModelBinders;
 
 namespace CarMarket.Server.Controllers;
 
@@ -46,8 +47,27 @@ public class CarShopsController(IRepositoryManager repository,
 		}
 	}
 
-	[HttpPost("{addressId}")]
-	public IActionResult CreateCarShop(Guid addressId, [FromBody] CarShopForUpdateDto carShop)
+	[HttpGet("collection/({ids})", Name = "CarShopCollection")]
+	public IActionResult GetCarShopCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
+	{
+		if (ids == null)
+		{
+			_logger.LogError("Parameter ids is null");
+			return BadRequest("Parameter ids is null");
+		}
+		var companyEntities = _repository.CarShop.GetByIds(ids, trackChanges: false);
+		if (ids.Count() != companyEntities.Count())
+		{
+			_logger.LogError("Some ids are not valid in a collection");
+			return NotFound();
+		}
+		var companiesToReturn = _mapper.Map<IEnumerable<CarShopDto>>(companyEntities);
+		return Ok(companiesToReturn);
+	}
+
+
+	[HttpPost]
+	public IActionResult CreateCarShop([FromBody] CarShopForManipulationDto carShop)
 	{
 		if (carShop == null)
 		{
@@ -55,19 +75,40 @@ public class CarShopsController(IRepositoryManager repository,
 			return BadRequest("CarShopForCreationDto object is null");
 		}
 
-		var address = _repository.Address.GetAddress(addressId, trackChanges: false);
-		if (address == null)
+		if (!ModelState.IsValid)
 		{
-			_logger.LogInfo($"Address with id: {address} doesn't exist in the database.");
-			return NotFound();
+			_logger.LogError("Invalid model state for the CarShopForCreationDto object");
+			return UnprocessableEntity(ModelState);
 		}
 
 		var carShopEntity = _mapper.Map<CarShop>(carShop);
-		_repository.CarShop.CreateCarShop(addressId, carShopEntity);
+		_repository.CarShop.CreateCarShop(carShopEntity);
 		_repository.Save();
 		var carShopToReturn = _mapper.Map<CarShopDto>(carShopEntity);
 		return CreatedAtRoute("GetCarShopById", new { id = carShopToReturn.Id }, carShopToReturn);
 	}
+
+	[HttpPost("collection")]
+	public IActionResult CreatecarShopCollection([FromBody] IEnumerable<CarShopForCreationDto> carShopCollection)
+	{
+		if (carShopCollection == null)
+		{
+			_logger.LogError("Company collection sent from client is null.");
+			return BadRequest("Company collection is null");
+		}
+		var companyEntities = _mapper.Map<IEnumerable<CarShop>>(carShopCollection);
+		foreach (var company in companyEntities)
+		{
+			_repository.CarShop.CreateCarShop(company);
+		}
+		_repository.Save();
+		var carShopCollectionToReturn =
+	   _mapper.Map<IEnumerable<CarShopDto>>(companyEntities);
+		var ids = string.Join(",", carShopCollectionToReturn.Select(c => c.Id));
+		return CreatedAtRoute("carShopCollection", new { ids },
+	   carShopCollectionToReturn);
+	}
+
 
 	[HttpDelete("{id}")]
 	public IActionResult DeleteCarShop(Guid id)

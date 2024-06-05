@@ -37,6 +37,7 @@ public class Program
 		services.ConfigureSqlContext(configuration);
 		services.ConfigureRepositoryManager();
 		services.ConfigureAutoMapping();
+		services.ConfigureApiBehaviorOptions();
 
 		services.AddControllers(config =>
 		{

@@ -15,15 +15,17 @@ public class CarShopConfiguration : IEntityTypeConfiguration<CarShop>
 				Id = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870"),
 				Name = "AutoShop Ltd",
 				Phone = "+375296578123",
-				AddressId = new Guid("10a1bca8-66a3-2b20-b5de-0a4a05497d4a"),
+				Address = "Gomel, Sovetskaia 15",
+				Country = "Belarus"
 			},
 			new CarShop
 			{
 				Id = new Guid("3d490a70-94c2-4d15-9494-5248280c2ce3"),
 				Name = "CarShop Ltd",
 				Phone = "+49446578123",
-				AddressId = new Guid("80abb1a8-a64d-4b20-b5de-0a470aa9764a"),
-			}
+				Address = "Berlin, Pohlstrbe 12",
+				Country = "German",
+			}	
 		);
 	}
 }

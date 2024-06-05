@@ -53,13 +53,19 @@ public class CarsController(IRepositoryManager repository,
 		return Ok(car);
 	}
 
-	[HttpPost("({brandId},{carcaseId})")]
-	public IActionResult CreateCarShop(Guid carShopId, Guid brandId, Guid carcaseId, [FromBody] CarForUpdateDto car)
+	[HttpPost]
+	public IActionResult CreateCarShop(Guid carShopId, [FromBody] CarForManipulationDto car)
 	{
 		if (car == null)
 		{
 			_logger.LogError("CarForCreationDto object sent from client is null.");
 			return BadRequest("CarForCreationDto object is null");
+		}
+
+		if (!ModelState.IsValid)
+		{
+			_logger.LogError("Invalid model state for the CarForCreationDto object");
+			return UnprocessableEntity(ModelState);
 		}
 
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
@@ -69,23 +75,8 @@ public class CarsController(IRepositoryManager repository,
 			return NotFound();
 		}
 
-		var brand = _repository.Brand.GetBrand(brandId, trackChanges: false);
-		if (brand == null)
-		{
-			_logger.LogInfo($"Brand with id: {brandId} doesn't exist in the database.");
-			return NotFound();
-		}
-
-		var carcase = _repository.Carcase.GetCarcase(carcaseId, trackChanges: false);
-		if (carcase == null)
-		{
-			_logger.LogInfo($"Carcase with id: {carcaseId} doesn't exist in the database.");
-			return NotFound();
-		}
-
-
 		var carEntity = _mapper.Map<Car>(car);
-		_repository.Car.CreateCar(carShopId, brandId, carcaseId, carEntity);
+		_repository.Car.CreateCar(carShopId, carEntity);
 		_repository.Save();
 		var carToReturn = _mapper.Map<CarDto>(carEntity);
 		return CreatedAtRoute("GetCarById", new { carShopId, id = carToReturn.Id }, carToReturn);
@@ -121,12 +112,14 @@ public class CarsController(IRepositoryManager repository,
 			_logger.LogError("CarForUpdateDto object sent from client is null.");
 			return BadRequest("CarForUpdateDto object is null");
 		}
+
 		var carShop = _repository.CarShop.GetCarShop(carShopId, trackChanges: false);
 		if (carShop == null)
 		{
 			_logger.LogInfo($"CarShop with id: {carShopId} doesn't exist in the database.");
 			return NotFound();
 		}
+
 		var carEntity = _repository.Car.GetCar(carShopId, id, trackChanges: true);
 		if (carEntity == null)
 		{

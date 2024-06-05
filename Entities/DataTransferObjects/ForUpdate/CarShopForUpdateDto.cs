@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.DataTransferObjects;
 
-public class CarShopForUpdateDto
+public class CarShopForUpdateDto : CarShopForManipulationDto
 {
-	public string Name { get; set; }
-	public string Phone { get; set; }
+
 }
