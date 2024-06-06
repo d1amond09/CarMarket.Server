@@ -32,7 +32,7 @@ public class CarShopsController(IRepositoryManager repository,
 	}
 
 
-	[HttpGet]
+	[HttpGet(Name = "GetCarShops")]
 	public async Task<IActionResult> GetCarShops()
 	{
 		var carShops = await _repository.CarShop.GetAllCarShopsAsync(trackChanges: false);
@@ -76,7 +76,7 @@ public class CarShopsController(IRepositoryManager repository,
 		return Ok(companiesToReturn);
 	}
 
-	[HttpPost]
+	[HttpPost(Name = "CreateCarShop")]
 	[ServiceFilter(typeof(ValidationFilterAttribute))]
 	public async Task<IActionResult> CreateCarShop([FromBody] CarShopForManipulationDto carShop)
 	{
