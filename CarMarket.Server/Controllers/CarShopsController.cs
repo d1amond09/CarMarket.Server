@@ -3,8 +3,6 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Entities.DataTransferObjects;
 using AutoMapper;
-using CarMarket.Server.Exceptions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Entities.Models;
 using System.ComponentModel.Design;
 using CarMarket.Server.ModelBinders;
@@ -12,8 +10,10 @@ using CarMarket.Server.ActionFilters;
 
 namespace CarMarket.Server.Controllers;
 
-[Route("api/carShops")]
 [ApiController]
+[Route("api/carShops")]
+[ApiVersion("1.0")]
+[ApiExplorerSettings(GroupName = "v1")]
 public class CarShopsController(IRepositoryManager repository, 
 								ILoggerManager logger, 
 								IMapper mapper) : ControllerBase
@@ -22,15 +22,12 @@ public class CarShopsController(IRepositoryManager repository,
 	private readonly ILoggerManager _logger = logger;
 	private readonly IMapper _mapper = mapper;
 
-
-
 	[HttpOptions]
 	public IActionResult GetCarShopsOptions()
 	{
 		Response.Headers.Append("Allow", "GET, OPTIONS, POST");
 		return Ok();
 	}
-
 
 	[HttpGet(Name = "GetCarShops")]
 	public async Task<IActionResult> GetCarShops()

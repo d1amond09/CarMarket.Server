@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using CarMarket.Server.ActionFilters;
 using CarMarket.Server.Extensions;
 using CarMarket.Server.Helpers;
@@ -28,7 +29,6 @@ public class Program
 		ConfigureApp(app);
 
 		app.MapControllers();
-
 		app.Run();
 	}
 
@@ -47,8 +47,7 @@ public class Program
 		services.AddScoped<IDataShaper<CarDto>, DataShaper<CarDto>>();
 		services.AddScoped<ValidateMediaTypeAttribute>();
 		services.AddScoped<CarLinks>();
-
-
+		services.ConfigureVersioning();
 
 		services.AddControllers(config =>
 		{

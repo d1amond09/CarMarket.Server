@@ -9,6 +9,9 @@ using Entities.Models;
 using CarMarket.Server.Formatters.Output;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
+using CarMarket.Server.Controllers;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace CarMarket.Server.Extensions;
 
@@ -88,5 +91,24 @@ public static class ServiceExtensions
 				.Add("application/vnd.codemaze.apiroot+xml");
 		});
 	}
+
+	public static void ConfigureVersioning(this IServiceCollection services)
+	{
+		services.AddEndpointsApiExplorer();
+
+		services.AddApiVersioning(opt =>
+			{
+				opt.ReportApiVersions = true;
+				opt.AssumeDefaultVersionWhenUnspecified = true;
+				opt.DefaultApiVersion = new ApiVersion(1, 0);
+				opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+				opt.Conventions.Controller<CarShopsController>()
+					.HasApiVersion(new ApiVersion(1, 0));
+				opt.Conventions.Controller<CarShopsV2Controller>()
+					.HasDeprecatedApiVersion(new ApiVersion(2, 0));
+			}
+		);
+	}
+
 
 }
