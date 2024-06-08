@@ -7,13 +7,13 @@ using Entities.Models;
 using System.ComponentModel.Design;
 using CarMarket.Server.ModelBinders;
 using CarMarket.Server.ActionFilters;
+using Marvin.Cache.Headers;
 
 namespace CarMarket.Server.Controllers;
 
 [ApiController]
 [Route("api/carShops")]
-[ApiVersion("1.0")]
-[ApiExplorerSettings(GroupName = "v1")]
+[ResponseCache(CacheProfileName = "120SecondsDuration")]
 public class CarShopsController(IRepositoryManager repository, 
 								ILoggerManager logger, 
 								IMapper mapper) : ControllerBase
@@ -39,6 +39,8 @@ public class CarShopsController(IRepositoryManager repository,
 		return Ok(carShopsDto);
 	}
 
+	[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)] 
+	[HttpCacheValidation(MustRevalidate = false)]
 	[HttpGet("{id}", Name = "GetCarShopById")]
 	public async Task<IActionResult> GetCarShop(Guid id)
 	{

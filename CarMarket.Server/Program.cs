@@ -10,6 +10,7 @@ using LoggerService;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NLog;
 using Repository.DataShaping;
@@ -48,9 +49,16 @@ public class Program
 		services.AddScoped<ValidateMediaTypeAttribute>();
 		services.AddScoped<CarLinks>();
 		services.ConfigureVersioning();
+		services.ConfigureResponseCaching();
+		services.ConfigureHttpCacheHeaders();
 
 		services.AddControllers(config =>
 		{
+			config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+			{
+				Duration = 120
+			});
+
 			config.RespectBrowserAcceptHeader = true;
 			config.ReturnHttpNotAcceptable = true;
 		}).AddNewtonsoftJson()
@@ -67,6 +75,8 @@ public class Program
 		app.UseHttpsRedirection();
 
 		app.UseCors("CorsPolicy");
+		app.UseResponseCaching();
+		app.UseHttpCacheHeaders();
 
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
 		{

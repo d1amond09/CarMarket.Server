@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using CarMarket.Server.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Marvin.Cache.Headers;
 
 namespace CarMarket.Server.Extensions;
 
@@ -101,7 +102,8 @@ public static class ServiceExtensions
 				opt.ReportApiVersions = true;
 				opt.AssumeDefaultVersionWhenUnspecified = true;
 				opt.DefaultApiVersion = new ApiVersion(1, 0);
-				opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+				opt.ApiVersionReader = new HeaderApiVersionReader("api-version"); 
+				//opt.ApiVersionReader = new QueryStringApiVersionReader("api-version");
 				opt.Conventions.Controller<CarShopsController>()
 					.HasApiVersion(new ApiVersion(1, 0));
 				opt.Conventions.Controller<CarShopsV2Controller>()
@@ -110,5 +112,18 @@ public static class ServiceExtensions
 		);
 	}
 
+	public static void ConfigureResponseCaching(this IServiceCollection services) =>
+		services.AddResponseCaching();
+
+	public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+		services.AddHttpCacheHeaders((expirationOpt) =>
+		{
+			expirationOpt.MaxAge = 65;
+			expirationOpt.CacheLocation = CacheLocation.Private;
+		},
+		(validationOpt) =>
+		{
+			validationOpt.MustRevalidate = true;
+		});
 
 }
