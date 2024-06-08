@@ -14,6 +14,10 @@ using CarMarket.Server.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Marvin.Cache.Headers;
 using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace CarMarket.Server.Extensions;
 
@@ -58,6 +62,8 @@ public static class ServiceExtensions
 		services.AddAutoMapper(x => x.CreateMap<Car, CarDto>());
 		services.AddAutoMapper(x => x.CreateMap<CarForManipulationDto, Car>());
 		services.AddAutoMapper(x => x.CreateMap<CarForUpdateDto, Car>().ReverseMap());
+
+		services.AddAutoMapper(x => x.CreateMap<UserForRegistrationDto, User>());
 	}
 
 	public static IMvcBuilder AddCustomCSVFormatter(this IMvcBuilder builder) =>
@@ -132,8 +138,8 @@ public static class ServiceExtensions
 		var rateLimitRules = new List<RateLimitRule> {	
 			new() {
 				Endpoint = "*",
-				Limit = 3,
-				Period = "5m"
+				Limit = 30,
+				Period = "5s"
 			}
 		};
 
@@ -147,5 +153,41 @@ public static class ServiceExtensions
 		services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 	}
 
+	public static void ConfigureIdentity(this IServiceCollection services)
+	{
+		var builder = services.AddIdentity<User, IdentityRole>(o =>
+		{
+			o.Password.RequireDigit = true;
+			o.Password.RequireLowercase = false;
+			o.Password.RequireUppercase = false;
+			o.Password.RequireNonAlphanumeric = false;
+			o.Password.RequiredLength = 10;
+			o.User.RequireUniqueEmail = true;
+		})
+		.AddEntityFrameworkStores<RepositoryContext>()
+		.AddDefaultTokenProviders();
+	}
 
+	public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+	{
+		var jwtSettings = configuration.GetSection("JwtSettings");
+		var secretKey = Environment.GetEnvironmentVariable("SECRETKEYCARMARKET");
+		services.AddAuthentication(opt => {
+			opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+			opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+		})
+		.AddJwtBearer(options =>
+		{
+			options.TokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				ValidateLifetime = true,
+				ValidateIssuerSigningKey = true,
+				ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
+				ValidAudience = jwtSettings.GetSection("validAudience").Value,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+			};
+		});
+	}
 }

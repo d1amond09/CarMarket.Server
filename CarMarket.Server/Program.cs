@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AspNetCoreRateLimit;
+using AuthenticationService;
 using CarMarket.Server.ActionFilters;
 using CarMarket.Server.Extensions;
 using CarMarket.Server.Helpers;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog;
 using Repository.DataShaping;
@@ -49,6 +51,7 @@ public class Program
 		services.AddScoped<IDataShaper<CarDto>, DataShaper<CarDto>>();
 		services.AddScoped<ValidateMediaTypeAttribute>();
 		services.AddScoped<CarLinks>();
+		services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 
 		services.ConfigureVersioning();
 
@@ -59,6 +62,9 @@ public class Program
 		services.ConfigureRateLimitingOptions();
 		services.AddHttpContextAccessor();
 
+		services.AddAuthentication();
+		services.ConfigureIdentity();
+		services.ConfigureJWT(configuration);
 
 		services.AddControllers(config =>
 		{
@@ -93,6 +99,8 @@ public class Program
 		});
 
 		app.UseRouting();
+
+		app.UseAuthentication();
 		app.UseAuthorization();
 
 		app.UseEndpoints(endpoints =>

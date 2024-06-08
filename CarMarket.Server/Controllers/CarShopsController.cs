@@ -8,6 +8,7 @@ using System.ComponentModel.Design;
 using CarMarket.Server.ModelBinders;
 using CarMarket.Server.ActionFilters;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarMarket.Server.Controllers;
 
@@ -30,6 +31,7 @@ public class CarShopsController(IRepositoryManager repository,
 	}
 
 	[HttpGet(Name = "GetCarShops")]
+	[Authorize(Roles = "Manager")]
 	public async Task<IActionResult> GetCarShops()
 	{
 		var carShops = await _repository.CarShop.GetAllCarShopsAsync(trackChanges: false);
