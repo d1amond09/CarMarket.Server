@@ -6,6 +6,7 @@ namespace CarMarket.Server.Controllers;
 
 [ApiController]
 [Route("api/carShops")]
+[ApiExplorerSettings(GroupName = "v2")]
 public class CarShopsV2Controller(IRepositoryManager repository) : ControllerBase
 {
 	private readonly IRepositoryManager _repository = repository;

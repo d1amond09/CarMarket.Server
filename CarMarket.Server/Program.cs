@@ -45,6 +45,7 @@ public class Program
 		services.ConfigureRepositoryManager();
 		services.ConfigureAutoMapping();
 		services.ConfigureApiBehaviorOptions();
+
 		services.AddScoped<ValidationFilterAttribute>();
 		services.AddScoped<ValidateCarShopExistsAttribute>();
 		services.AddScoped<ValidateCarForCarShopExistsAttribute>();
@@ -66,6 +67,8 @@ public class Program
 		services.ConfigureIdentity();
 		services.ConfigureJWT(configuration);
 
+		services.ConfigureSwagger();
+
 		services.AddControllers(config =>
 		{
 			config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
@@ -84,7 +87,6 @@ public class Program
 
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
-
 		app.ConfigureExceptionMiddleware();
 		app.UseHttpsRedirection();
 
@@ -92,6 +94,14 @@ public class Program
 		app.UseCors("CorsPolicy");
 		app.UseResponseCaching();
 		app.UseHttpCacheHeaders();
+
+		app.UseSwagger();
+		app.UseSwaggerUI(s =>
+		{
+			s.SwaggerEndpoint("/swagger/v1/swagger.json", "Code Maze API v1");
+			s.SwaggerEndpoint("/swagger/v2/swagger.json", "Code Maze API v2");
+		});
+
 
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
 		{
