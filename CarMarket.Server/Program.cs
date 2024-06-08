@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using AspNetCoreRateLimit;
 using CarMarket.Server.ActionFilters;
 using CarMarket.Server.Extensions;
 using CarMarket.Server.Helpers;
@@ -48,9 +49,16 @@ public class Program
 		services.AddScoped<IDataShaper<CarDto>, DataShaper<CarDto>>();
 		services.AddScoped<ValidateMediaTypeAttribute>();
 		services.AddScoped<CarLinks>();
+
 		services.ConfigureVersioning();
+
 		services.ConfigureResponseCaching();
 		services.ConfigureHttpCacheHeaders();
+		services.AddMemoryCache();
+
+		services.ConfigureRateLimitingOptions();
+		services.AddHttpContextAccessor();
+
 
 		services.AddControllers(config =>
 		{
@@ -74,6 +82,7 @@ public class Program
 		app.ConfigureExceptionMiddleware();
 		app.UseHttpsRedirection();
 
+		app.UseIpRateLimiting();
 		app.UseCors("CorsPolicy");
 		app.UseResponseCaching();
 		app.UseHttpCacheHeaders();
